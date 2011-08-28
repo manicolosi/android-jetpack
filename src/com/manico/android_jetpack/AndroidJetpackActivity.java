@@ -2,14 +2,20 @@ package com.manico.android_jetpack;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 
 public class AndroidJetpackActivity extends Activity
 {
-    /** Called when the activity is first created. */
+    private static final String TAG = "AndroidJetpackActivity";
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+
+        Game game = new Game ();
+        GameView gameView = new GameView(this, game);
+
+        setContentView(gameView);
     }
 }
