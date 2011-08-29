@@ -1,14 +1,18 @@
 package com.manico.android_jetpack;
 
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.Path.Direction;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
-import java.util.ArrayList;
+
+import java.io.InputStream;
+import java.io.IOException;
 
 public class GameThread extends Thread
 {
@@ -21,9 +25,13 @@ public class GameThread extends Thread
 
     private Paint mBgPaint;
     private Paint mTextPaint;
-    private Paint mWallPaint;
+    private Paint mPlayerPaint;
+
+    private Bitmap tiles;
 
     private int mFps;
+
+    private static int TILE_SIZE_SCREEN = 32;
 
     public GameThread(SurfaceHolder holder, Game game)
     {
@@ -37,8 +45,17 @@ public class GameThread extends Thread
         mTextPaint.setColor(0xff00ff00);
         mTextPaint.setTextSize(15);
 
-        mWallPaint = new Paint();
-        mWallPaint.setColor(0xffff0000);
+        mPlayerPaint = new Paint();
+        mPlayerPaint.setColor(0xff00ff00);
+
+        try {
+            AssetManager assets = GameApp.getContext().getAssets();
+            InputStream stream = assets.open("tiles.png");
+            tiles = BitmapFactory.decodeStream(stream);
+            stream.close();
+        } catch (IOException e) {
+            Log.d("AndroidJetpack", "IOException occurred while loading tiles.png");
+        }
     }
 
     @Override
@@ -53,7 +70,7 @@ public class GameThread extends Thread
 
         Canvas canvas;
 
-        while(mRunning) {
+        while (mRunning) {
             old = current;
             current = System.currentTimeMillis();
             dtime = (current - old) / 1000.0;
@@ -89,16 +106,26 @@ public class GameThread extends Thread
     {
     }
 
+    private int vpx;
+    private int vpy;
+
     public void render(Canvas canvas)
     {
+        Player p = mGame.getPlayer();
+
         canvas.drawPaint(mBgPaint);
 
+        vpx = (p.getX() * TILE_SIZE_SCREEN) + (TILE_SIZE_SCREEN / 2) - (canvas.getWidth() / 2);
+        vpy = (p.getY() * TILE_SIZE_SCREEN) + (TILE_SIZE_SCREEN / 2) - (canvas.getHeight() / 2);
+
         renderLevel(canvas);
+        renderPlayer(canvas, p);
 
         canvas.drawText("FPS: " + mFps, 5, 15, mTextPaint);
     }
 
-    private static int TILE_SIZE = 32;
+    private Rect src = new Rect(0, 0, 16, 16);
+    private Rect dst = new Rect();
 
     public void renderLevel(Canvas canvas)
     {
@@ -108,12 +135,30 @@ public class GameThread extends Thread
 
         for (int x = 0; x < lvl_w; x++) {
             for (int y = 0; y < lvl_h; y++) {
-                if (lvl.isWall(x, y)) {
-                    int sx = x * TILE_SIZE;
-                    int sy = y * TILE_SIZE;
-                    canvas.drawRect(sx, sy, sx + TILE_SIZE, sy + TILE_SIZE, mWallPaint);
+                int tile = lvl.getTile(x, y);
+
+                if (Tile.isWall(tile)) {
+                    Point src_tl = Tile.getTopLeft(tile);
+                    src.left = src_tl.x;
+                    src.top = src_tl.y;
+
+                    dst.left   = x * TILE_SIZE_SCREEN - vpx;
+                    dst.top    = y * TILE_SIZE_SCREEN - vpy;
+                    dst.right  = (x+1) * TILE_SIZE_SCREEN - vpx;
+                    dst.bottom = (y+1) * TILE_SIZE_SCREEN - vpy;
+
+                    canvas.drawBitmap(tiles, src, dst, mBgPaint);
                 }
             }
         }
+    }
+
+    public void renderPlayer(Canvas canvas, Player p)
+    {
+        int x = p.getX();
+        int y = p.getY();
+
+        canvas.drawRect(x * TILE_SIZE_SCREEN - vpx, y * TILE_SIZE_SCREEN - vpy,
+                (x+1) * TILE_SIZE_SCREEN - vpx, (y+1) * TILE_SIZE_SCREEN - vpy, mPlayerPaint);
     }
 }

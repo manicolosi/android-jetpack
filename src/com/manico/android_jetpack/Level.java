@@ -10,9 +10,10 @@ import java.io.IOException;
 
 public class Level
 {
-    private boolean map[][];
+    private int map[][];
     private int width;
     private int height;
+    private Player player;
 
     public Level(String name)
     {
@@ -25,24 +26,30 @@ public class Level
             width = bitmap.getWidth();
             height = bitmap.getHeight();
 
-            map = new boolean[width][height];
+            map = new int[width][height];
 
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
-                    map[x][y] = bitmap.getPixel(x, y) == 0xffff0000;
+                    int tile = bitmap.getPixel(x, y);
+                    map[x][y] = tile;
+
+                    if (tile == 0xff00ff00) {
+                        player = new Player(x, y);
+                    }
                 }
             }
 
         } catch (IOException e) {
-            Log.d("AndroidJetpack", "IOException occurred while load level: " + name);
+            Log.d("AndroidJetpack", "IOException occurred while loading level: " + name);
         }
     }
 
-    public boolean isWall(int x, int y)
+    public int getTile(int x, int y)
     {
         return map[x][y];
     }
 
     public int getWidth() { return width; }
     public int getHeight() { return height; }
+    public Player getPlayer() { return player; }
 }

@@ -10,4 +10,5 @@ public class Game
     }
 
     public Level getLevel() { return level; }
+    public Player getPlayer() { return level.getPlayer(); }
 }
