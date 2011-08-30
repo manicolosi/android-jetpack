@@ -26,7 +26,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback
 
     public void surfaceCreated(SurfaceHolder holder)
     {
-        thread = new GameThread(holder, game);
+        thread = new GameThread(holder, this, game);
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format,

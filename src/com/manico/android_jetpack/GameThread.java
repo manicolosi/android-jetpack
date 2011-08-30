@@ -10,6 +10,8 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.Log;
 import android.view.SurfaceHolder;
+import android.view.KeyEvent;
+import android.view.View;
 
 import java.io.InputStream;
 import java.io.IOException;
@@ -19,7 +21,10 @@ public class GameThread extends Thread
     private static final String TAG = "GameThread";
 
     private SurfaceHolder mHolder;
+    private View mView;
     private Game mGame;
+
+    private InputHandler mInput;
 
     private boolean mRunning = false;
 
@@ -34,10 +39,13 @@ public class GameThread extends Thread
 
     private static int TILE_SIZE_SCREEN = 32;
 
-    public GameThread(SurfaceHolder holder, Game game)
+    public GameThread(SurfaceHolder holder, View view, Game game)
     {
         mHolder = holder;
+        mView = view;
         mGame = game;
+
+        mInput = new InputHandler(view);
 
         mBgPaint = new Paint();
         mBgPaint.setColor(0xff000000);
@@ -91,7 +99,7 @@ public class GameThread extends Thread
             try {
                 canvas = mHolder.lockCanvas();
                 synchronized (mHolder) {
-                    updatePhysics(dtime);
+                    tick(dtime);
                     render(canvas);
                 }
             } finally {
@@ -107,8 +115,14 @@ public class GameThread extends Thread
         mRunning = b;
     }
 
-    public void updatePhysics(double dtime)
+    public void tick(double dtime)
     {
+        Player p = mGame.getPlayer();
+
+        boolean left  = mInput.isKeyDown(KeyEvent.KEYCODE_DPAD_LEFT);
+        boolean right = mInput.isKeyDown(KeyEvent.KEYCODE_DPAD_RIGHT);
+
+        p.tick(left, right);
     }
 
     private int vpx;
