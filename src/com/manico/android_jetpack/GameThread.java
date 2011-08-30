@@ -122,7 +122,7 @@ public class GameThread extends Thread
         boolean left  = mInput.isKeyDown(KeyEvent.KEYCODE_DPAD_LEFT);
         boolean right = mInput.isKeyDown(KeyEvent.KEYCODE_DPAD_RIGHT);
 
-        p.tick(left, right);
+        p.tick(dtime, left, right);
     }
 
     private int vpx;
@@ -134,8 +134,8 @@ public class GameThread extends Thread
 
         canvas.drawPaint(mBgPaint);
 
-        vpx = (p.getX() * TILE_SIZE_SCREEN) + (TILE_SIZE_SCREEN / 2) - (canvas.getWidth() / 2);
-        vpy = (p.getY() * TILE_SIZE_SCREEN) + (TILE_SIZE_SCREEN / 2) - (canvas.getHeight() / 2);
+        vpx = (int) (p.getX() * TILE_SIZE_SCREEN) + (TILE_SIZE_SCREEN / 2) - (canvas.getWidth() / 2);
+        vpy = (int) (p.getY() * TILE_SIZE_SCREEN) + (TILE_SIZE_SCREEN / 2) - (canvas.getHeight() / 2);
 
         renderLevel(canvas);
         renderPlayer(canvas, p);
@@ -174,8 +174,8 @@ public class GameThread extends Thread
     {
         src = p.getTextureBounds();
 
-        dst.left   = p.getX() * TILE_SIZE_SCREEN - vpx;
-        dst.top    = p.getY() * TILE_SIZE_SCREEN - vpy - (src.height() - TILE_SIZE_SCREEN);
+        dst.left   = (int) (p.getX() * TILE_SIZE_SCREEN - vpx);
+        dst.top    = (int) (p.getY() * TILE_SIZE_SCREEN - vpy - (src.height() - TILE_SIZE_SCREEN));
         dst.right  = dst.left + src.width();
         dst.bottom = dst.top  + src.height();
 
