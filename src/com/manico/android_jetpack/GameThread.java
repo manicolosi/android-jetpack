@@ -27,7 +27,8 @@ public class GameThread extends Thread
     private Paint mTextPaint;
     private Paint mPlayerPaint;
 
-    private Bitmap tiles;
+    private Bitmap mTilesBitmap;
+    private Bitmap mEntitiesBitmap;
 
     private int mFps;
 
@@ -51,7 +52,11 @@ public class GameThread extends Thread
         try {
             AssetManager assets = GameApp.getContext().getAssets();
             InputStream stream = assets.open("tiles.png");
-            tiles = BitmapFactory.decodeStream(stream);
+            mTilesBitmap = BitmapFactory.decodeStream(stream);
+            stream.close();
+
+            stream = assets.open("entities.png");
+            mEntitiesBitmap = BitmapFactory.decodeStream(stream);
             stream.close();
         } catch (IOException e) {
             Log.d("AndroidJetpack", "IOException occurred while loading tiles.png");
@@ -138,16 +143,14 @@ public class GameThread extends Thread
                 int tile = lvl.getTile(x, y);
 
                 if (Tile.isWall(tile)) {
-                    Point src_tl = Tile.getTopLeft(tile);
-                    src.left = src_tl.x;
-                    src.top = src_tl.y;
+                    src = Tile.getTextureBounds(tile);
 
                     dst.left   = x * TILE_SIZE_SCREEN - vpx;
                     dst.top    = y * TILE_SIZE_SCREEN - vpy;
-                    dst.right  = (x+1) * TILE_SIZE_SCREEN - vpx;
-                    dst.bottom = (y+1) * TILE_SIZE_SCREEN - vpy;
+                    dst.right  = dst.left + TILE_SIZE_SCREEN;
+                    dst.bottom = dst.top  + TILE_SIZE_SCREEN;
 
-                    canvas.drawBitmap(tiles, src, dst, mBgPaint);
+                    canvas.drawBitmap(mTilesBitmap, src, dst, null);
                 }
             }
         }
@@ -155,10 +158,13 @@ public class GameThread extends Thread
 
     public void renderPlayer(Canvas canvas, Player p)
     {
-        int x = p.getX();
-        int y = p.getY();
+        src = p.getTextureBounds();
 
-        canvas.drawRect(x * TILE_SIZE_SCREEN - vpx, y * TILE_SIZE_SCREEN - vpy,
-                (x+1) * TILE_SIZE_SCREEN - vpx, (y+1) * TILE_SIZE_SCREEN - vpy, mPlayerPaint);
+        dst.left   = p.getX() * TILE_SIZE_SCREEN - vpx;
+        dst.top    = p.getY() * TILE_SIZE_SCREEN - vpy - (src.height() - TILE_SIZE_SCREEN);
+        dst.right  = dst.left + src.width();
+        dst.bottom = dst.top  + src.height();
+
+        canvas.drawBitmap(mEntitiesBitmap, src, dst, null);
     }
 }
