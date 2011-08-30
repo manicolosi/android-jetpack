@@ -28,6 +28,12 @@ public class InputHandler implements OnKeyListener, OnTouchListener
     @Override
     public boolean onTouch(View v, MotionEvent event)
     {
+        if (event.getAction() == MotionEvent.ACTION_MOVE) {
+            event.setAction(MotionEvent.ACTION_DOWN);
+            keyboard_state.put(KeyEvent.KEYCODE_DPAD_LEFT, false);
+            keyboard_state.put(KeyEvent.KEYCODE_DPAD_RIGHT, false);
+        }
+
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             int keycode = (int)event.getX() < (v.getWidth() / 2) ?
                         KeyEvent.KEYCODE_DPAD_LEFT : KeyEvent.KEYCODE_DPAD_RIGHT;
