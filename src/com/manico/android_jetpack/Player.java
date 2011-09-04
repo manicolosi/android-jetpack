@@ -26,12 +26,16 @@ public class Player
     public int getY() { return y; }
     public Rect getTextureBounds() { return texture_bounds; }
 
+    private double velocity_x = 0;
+    private double velocity_y = 0;
 
     private int ACCELERATION = 25 * 32;
     private int MAX_VELOCITY = 5  * 32;
-    private double velocity_x = 0;
 
-    public void tick(double dtime, boolean left, boolean right)
+    private int GRAVITY       =  20 * 32;
+    private int JUMP_VELOCITY = -10 * 32;
+
+    public void tick(double dtime, boolean left, boolean right, boolean jump)
     {
         if (left) {
             velocity_x -= ACCELERATION * dtime;
@@ -48,11 +52,46 @@ public class Player
             }
         }
 
-        Math.min(Math.max(velocity_x, - MAX_VELOCITY), MAX_VELOCITY);
-
+        velocity_x = Math.min(Math.max(velocity_x, - MAX_VELOCITY), MAX_VELOCITY);
         x += (int)(velocity_x * dtime);
 
         resolveHorizCollisions();
+
+        if (onGround() && !jumping) {
+            if (jump) {
+                velocity_y = JUMP_VELOCITY;
+                jumping = true;
+            } else {
+                velocity_y = 0;
+            }
+        } else {
+            velocity_y += GRAVITY * dtime;
+        }
+        y += (int)(velocity_y * dtime);
+
+        resolveVertCollisions();
+    }
+
+    private boolean jumping = false;
+
+    private boolean onGround() {
+        int bottom_y = y + height;
+        int cx = x + (width / 2);
+        if(Tile.isWall(level.getTile(cx / 32, bottom_y / 32))) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void resolveVertCollisions() {
+        int cx = (x + width / 2) / 32;
+        int bottom = (y + height) / 32;
+
+        if (Tile.isWall(level.getTile(cx, bottom))) {
+            y = bottom * 32 - 48;
+            jumping = false;
+        }
     }
 
     private void resolveHorizCollisions() {
@@ -65,11 +104,9 @@ public class Player
         int bottom = (cy + (height / 2) - 2) / 32;
 
         if (Tile.isWall(level.getTile(left, top)) || Tile.isWall(level.getTile(left, bottom))) {
-            Log.d("AndroidJetpack", "Left Side");
             x = (left+1) * 32 - 5;
         }
         if (Tile.isWall(level.getTile(right, top)) || Tile.isWall(level.getTile(right, bottom))) {
-            Log.d("AndroidJetpack", "Right Side");
             x = (right-1) * 32 + 5 - 1;
         }
     }

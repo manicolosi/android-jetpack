@@ -121,8 +121,9 @@ public class GameThread extends Thread
 
         boolean left  = mInput.isKeyDown(KeyEvent.KEYCODE_DPAD_LEFT);
         boolean right = mInput.isKeyDown(KeyEvent.KEYCODE_DPAD_RIGHT);
+        boolean jump = mInput.isKeyDown(KeyEvent.KEYCODE_DPAD_CENTER);
 
-        p.tick(dtime, left, right);
+        p.tick(dtime, left, right, jump);
     }
 
     private int vpx;
