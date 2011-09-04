@@ -134,8 +134,8 @@ public class GameThread extends Thread
 
         canvas.drawPaint(mBgPaint);
 
-        vpx = (int) (p.getX() * TILE_SIZE_SCREEN) + (TILE_SIZE_SCREEN / 2) - (canvas.getWidth() / 2);
-        vpy = (int) (p.getY() * TILE_SIZE_SCREEN) + (TILE_SIZE_SCREEN / 2) - (canvas.getHeight() / 2);
+        vpx = p.getX() + (TILE_SIZE_SCREEN / 2) - (canvas.getWidth() / 2);
+        vpy = p.getY() + (TILE_SIZE_SCREEN / 2) - (canvas.getHeight() / 2);
 
         renderLevel(canvas);
         renderPlayer(canvas, p);
@@ -174,8 +174,8 @@ public class GameThread extends Thread
     {
         src = p.getTextureBounds();
 
-        dst.left   = (int) (p.getX() * TILE_SIZE_SCREEN - vpx);
-        dst.top    = (int) (p.getY() * TILE_SIZE_SCREEN - vpy - (src.height() - TILE_SIZE_SCREEN));
+        dst.left   = (int) (p.getX() - vpx);
+        dst.top    = (int) (p.getY() - vpy);
         dst.right  = dst.left + src.width();
         dst.bottom = dst.top  + src.height();
 

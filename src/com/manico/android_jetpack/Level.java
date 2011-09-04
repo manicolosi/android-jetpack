@@ -34,7 +34,7 @@ public class Level
                     map[x][y] = tile;
 
                     if (tile == 0xff00ff00) {
-                        player = new Player(x, y);
+                        player = new Player(this, x, y);
                     }
                 }
             }
