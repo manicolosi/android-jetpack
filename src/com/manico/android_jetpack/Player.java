@@ -102,11 +102,14 @@ public class Player
         int right  = (cx + (width / 2) - 5) /  32;
         int top    = (cy - (height / 2)) / 32;
         int bottom = (cy + (height / 2) - 2) / 32;
+        int middle = cy / 32;
 
-        if (Tile.isWall(level.getTile(left, top)) || Tile.isWall(level.getTile(left, bottom))) {
+        if (Tile.isWall(level.getTile(left, top)) || Tile.isWall(level.getTile(left, bottom)) ||
+            Tile.isWall(level.getTile(left, middle))) {
             x = (left+1) * 32 - 5;
         }
-        if (Tile.isWall(level.getTile(right, top)) || Tile.isWall(level.getTile(right, bottom))) {
+        if (Tile.isWall(level.getTile(right, top)) || Tile.isWall(level.getTile(right, bottom)) ||
+            Tile.isWall(level.getTile(right, middle))) {
             x = (right-1) * 32 + 5 - 1;
         }
     }
