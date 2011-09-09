@@ -150,11 +150,14 @@ public class GameThread extends Thread
     public void renderLevel(Canvas canvas)
     {
         Level lvl = mGame.getLevel();
-        int lvl_w = lvl.getWidth();
-        int lvl_h = lvl.getHeight();
 
-        for (int x = 0; x < lvl_w; x++) {
-            for (int y = 0; y < lvl_h; y++) {
+        int vpx_tile = Math.max(0, vpx / 32);
+        int vpy_tile = Math.max(0, vpy / 32);
+        int vpw_tile = Math.min(lvl.getWidth(),  vpx_tile + canvas.getWidth() / 32 + 1);
+        int vph_tile = Math.min(lvl.getHeight(), vpy_tile + canvas.getHeight() / 32);
+
+        for (int x = vpx_tile; x < vpw_tile; x++) {
+            for (int y = vpy_tile; y < vph_tile; y++) {
                 int tile = lvl.getTile(x, y);
 
                 if (Tile.isWall(tile)) {
