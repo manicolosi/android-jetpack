@@ -57,17 +57,21 @@ public class GameThread extends Thread
         mPlayerPaint = new Paint();
         mPlayerPaint.setColor(0xff00ff00);
 
+        AssetManager assets = GameApp.getContext().getAssets();
         try {
-            AssetManager assets = GameApp.getContext().getAssets();
             InputStream stream = assets.open("tiles.png");
             mTilesBitmap = BitmapFactory.decodeStream(stream);
             stream.close();
+        } catch (IOException e) {
+            Log.d("AndroidJetpack", "IOException occurred while loading tiles.png");
+        }
 
-            stream = assets.open("entities.png");
+        try {
+            InputStream stream = assets.open("entities.png");
             mEntitiesBitmap = BitmapFactory.decodeStream(stream);
             stream.close();
         } catch (IOException e) {
-            Log.d("AndroidJetpack", "IOException occurred while loading tiles.png");
+            Log.d("AndroidJetpack", "IOException occurred while loading entities.png");
         }
     }
 
